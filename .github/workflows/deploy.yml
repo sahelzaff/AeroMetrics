@@ -18,7 +18,7 @@ jobs:
         run: echo 🚀 Starting deployment
 
       - name: Deploy App
-        run: powershell -ExecutionPolicy Bypass -File "C:\Users\RAKA\Documents\Work\deploy\AeroMetrics\deploy.ps1"
+        run: powershell -ExecutionPolicy Bypass -File "C:\deploy\AeroMetrics\deploy.ps1"
 
       - name: Done
         run: echo ✅ Deployment completed
