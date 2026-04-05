@@ -15,10 +15,10 @@ jobs:
 
     steps:
       - name: Start Deployment
-        run: echo 🚀 Starting deployment
+        run: echo Starting deployment
 
       - name: Deploy App
         run: powershell -ExecutionPolicy Bypass -File "C:\deploy\AeroMetrics\deploy.ps1"
 
       - name: Done
-        run: echo ✅ Deployment completed
+        run: echo Deployment completed
