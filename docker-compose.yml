@@ -1,7 +1,6 @@
 ﻿services:
   postgres:
     image: postgres:16-alpine
-    container_name: aviation-test-postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: aviation_test
@@ -21,7 +20,6 @@
   backend:
     build:
       context: ./backend
-    container_name: aviation-test-backend
     restart: unless-stopped
     depends_on:
       postgres:
@@ -43,7 +41,6 @@
   frontend:
     build:
       context: ./frontend
-    container_name: aviation-test-frontend
     restart: unless-stopped
     depends_on:
       - backend
@@ -54,7 +51,6 @@
 
   postgres-backup:
     image: prodrigestivill/postgres-backup-local:16
-    container_name: aviation-test-postgres-backup
     restart: unless-stopped
     depends_on:
       postgres:
