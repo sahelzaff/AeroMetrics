@@ -1,0 +1,10 @@
+name: Init
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: echo "GitHub Actions initialized"
