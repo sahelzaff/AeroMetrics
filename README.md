@@ -1,93 +1,199 @@
-﻿# Weekly MCQ Test Platform
+# ✈️ AeroMetrics — Measure. Improve. Master.
 
-A local-first full-stack test-taking application with:
-- React + Vite frontend
-- NestJS + Prisma backend
-- PostgreSQL database
-- Email/password + Google OAuth auth
-- Chapter-wise import, blueprint-driven tests, attempt workflow, and analytics dashboard
-- HTTP-only cookie refresh token flow with frontend auto-refresh interceptor
+AeroMetrics is an advanced aviation-focused test platform that goes beyond scoring to deliver deep performance analytics. It helps users identify weak areas, track progress, and improve through intelligent insights and adaptive practice.
 
-## Project Structure
-- `frontend/` React app
-- `backend/` NestJS API + Prisma schema
-- `docker-compose.yml` local orchestration for `frontend`, `backend`, and `postgres`
+---
 
-## Quick Start (Docker)
-1. Run `docker compose up --build`
-2. Open frontend at `http://localhost:5173`
-3. Backend docs at `http://localhost:4000/docs`
+## 🚀 Features
 
-## Quick Start (Without Docker)
-1. Start Postgres and create DB `aviation_test`
-2. Backend:
-   - `cd backend`
-   - copy `.env.example` to `.env` and set secrets
-   - `npm install`
-   - `npm run prisma:generate`
-   - `npm run db:push`
-   - `npm run start:dev`
-3. Frontend:
-   - `cd frontend`
-   - copy `.env.example` to `.env`
-   - `npm install`
-   - `npm run dev`
+### 🧪 Test Engine
 
-## Implemented API Endpoints
-- Auth:
-  - `POST /auth/register`
-  - `POST /auth/login`
-  - `GET /auth/google`
-  - `GET /auth/google/callback`
-  - `POST /auth/refresh`
-  - `POST /auth/logout`
-- Import:
-  - `POST /imports/questions:dry-run`
-  - `POST /imports/questions:commit`
-- Blueprints:
-  - `GET /blueprints`
-  - `POST /blueprints`
-- Question bank:
-  - `GET /question-bank/structure`
-- Test engine:
-  - `POST /tests/generate-from-blueprint`
-- Attempts:
-  - `POST /attempts/start`
-  - `GET /attempts/:id`
-  - `PATCH /attempts/:id/answer`
-  - `POST /attempts/:id/submit`
-  - `GET /attempts/:id/review`
-- Analytics:
-  - `GET /dashboard/overview`
-  - `GET /analytics/chapters`
-  - `GET /analytics/wrong-questions`
+* Blueprint-based test generation
+* Section-wise configuration
+* Difficulty-based question selection
+* One-question-per-view exam interface
 
-All endpoints except login/register/google/refresh/health require `Authorization: Bearer <accessToken>`.
-`/auth/refresh` reads refresh token from secure HTTP-only cookie.
+### 📊 Performance Analytics
 
-## Import JSON Format
-```json
-{
-  "subject": "Physics",
-  "chapter": "Kinematics",
-  "questions": [
-    {
-      "question_text": "A body starts from rest and accelerates at 2 m/s². Speed after 5s?",
-      "options": ["5 m/s", "10 m/s", "12 m/s", "2 m/s"],
-      "correct_option_index": 1,
-      "explanation": "v = u + at = 0 + 2*5",
-      "difficulty": "EASY",
-      "source_ref": "Testbook-Week-1",
-      "tags": ["motion", "equations"]
-    }
-  ]
-}
+* Accuracy, score, and time tracking
+* Speed vs accuracy insights
+* Chapter-wise mastery tracking
+* Weak area detection
+
+### 🧠 Intelligent Insights
+
+* Personalized performance feedback
+* Concept gap identification
+* Guess vs confident answer detection
+* Improvement recommendations
+
+### 🔁 Review System
+
+* Question-level review
+* Correct vs incorrect answer comparison
+* Detailed explanations
+* Time spent per question
+
+### 📥 Question Import System
+
+* JSON / CSV / Excel support
+* Bulk question ingestion
+* Tag-based filtering
+* Validation & error handling
+
+### 🎯 Adaptive Learning (Planned / In Progress)
+
+* Weak chapter prioritization
+* Smart revision queue
+* Personalized test generation
+
+---
+
+## 🏗️ Tech Stack
+
+### Frontend
+
+* React + Vite + TypeScript
+* Tailwind CSS
+* TanStack Query
+
+### Backend
+
+* NestJS
+* PostgreSQL
+* Prisma ORM
+
+### Other
+
+* JWT Authentication
+* REST APIs
+* Scalable modular architecture
+
+---
+
+## 📦 Project Structure
+
+```
+aerometrics/
+│
+├── frontend/        # React application
+├── backend/         # NestJS API
+├── prisma/          # Database schema
+├── scripts/         # Utility scripts
+└── docs/            # Documentation
 ```
 
-## Notes
-- Scoring is fixed to `+1` for correct and `0` for incorrect.
-- Duplicate detection uses hash of `question_text + options`.
-- Re-import with content changes creates a new question version and keeps attempt history stable.
-- Import supports partial failures: valid questions are imported and invalid ones are reported by index.
-- Dashboard includes trend, chapter accuracy, and weak chapter identification.
-- Test generation supports weighted randomness and optional weak-chapter prioritization toggle.
+---
+
+## ⚙️ Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/your-username/aerometrics.git
+cd aerometrics
+```
+
+### 2. Setup Backend
+
+```bash
+cd backend
+npm install
+```
+
+Create `.env`:
+
+```
+DATABASE_URL="postgresql://user:password@localhost:5432/aerometrics"
+JWT_SECRET="your_secret"
+```
+
+Run migrations:
+
+```bash
+npx prisma migrate dev
+```
+
+Start backend:
+
+```bash
+npm run start:dev
+```
+
+---
+
+### 3. Setup Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+## 📡 API Overview
+
+### Auth
+
+* `POST /auth/login`
+* `POST /auth/register`
+
+### Tests
+
+* `POST /tests/generate`
+* `GET /tests/:id`
+
+### Attempts
+
+* `POST /attempts/:id/submit`
+* `GET /attempts/:id/review`
+
+### Analytics
+
+* `GET /analytics/overview`
+* `GET /analytics/chapters`
+* `GET /analytics/wrong-questions`
+
+### Import
+
+* `POST /questions/import`
+
+---
+
+## 📊 Core Metrics
+
+* Accuracy (%)
+* Speed (questions/min)
+* Weighted Score
+* Mastery Score (chapter-level)
+* Priority Score (weak areas)
+* Confidence-based analysis
+
+---
+
+## 🧠 Future Enhancements
+
+* AI-based recommendations
+* Real-time proctoring
+* Performance prediction
+* Leaderboards & ranking system
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome!
+Feel free to fork the repo and submit a PR.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 💡 Tagline
+
+**Measure. Improve. Master.**
