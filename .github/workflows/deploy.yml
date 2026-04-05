@@ -1,0 +1,32 @@
+name: Deploy AeroMetrics
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout latest code
+        uses: actions/checkout@v3
+
+      - name: Navigate to project directory
+        run: cd C:\Users\RAKA\Documents\Work\deploy\AeroMetrics
+
+      - name: Pull latest changes
+        run: git pull origin main
+
+      - name: Build containers
+        run: docker compose build
+
+      - name: Restart containers (safe)
+        run: docker compose up -d
+
+      - name: Run Prisma migrations
+        run: docker exec aviation-test-backend npx prisma migrate deploy
+
+      - name: Cleanup unused images
+        run: docker system prune -f

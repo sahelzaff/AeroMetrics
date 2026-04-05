@@ -111,6 +111,9 @@ export function AttemptPage() {
 
   const questions = attemptQuery.data?.questions ?? [];
   const currentQuestion = questions[currentIndex];
+  const isCurrentMarkedForReview = Boolean(
+    currentQuestion ? reviewMarked[currentQuestion.attemptQuestionId] : false,
+  );
 
   const paletteItems = useMemo(() => {
     return questions.map((question, index) => {
@@ -176,7 +179,7 @@ export function AttemptPage() {
 
       <div className="flex h-full gap-4 overflow-hidden">
         <section className="card flex w-full flex-col lg:w-[70%]">
-          <div className="mb-4 flex items-end justify-between">
+          <div className="mb-4 flex items-end justify-between gap-4">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--primary)]">Question {currentIndex + 1} of {questions.length}</p>
               <h2 className="mt-2 text-xl font-bold">{currentQuestion.questionText}</h2>
@@ -184,7 +187,11 @@ export function AttemptPage() {
             </div>
             <button
               type="button"
-              className={`btn-secondary ${reviewMarked[currentQuestion.attemptQuestionId] ? 'bg-[var(--tertiary-fixed)] text-[var(--tertiary)]' : ''}`}
+              className={`btn-secondary inline-flex h-11 w-[190px] shrink-0 items-center justify-center gap-2 whitespace-nowrap transition ${
+                isCurrentMarkedForReview
+                  ? 'border-[var(--tertiary)]/40 bg-[var(--tertiary-fixed)] text-[var(--tertiary)] shadow-sm'
+                  : 'text-[var(--on-surface-variant)]'
+              }`}
               onClick={() =>
                 setReviewMarked((prev) => ({
                   ...prev,
@@ -192,7 +199,17 @@ export function AttemptPage() {
                 }))
               }
             >
-              Mark for Review
+              <span
+                className="material-symbols-outlined text-base"
+                style={{
+                  fontVariationSettings: isCurrentMarkedForReview
+                    ? "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24"
+                    : "'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24",
+                }}
+              >
+                bookmark
+              </span>
+              {isCurrentMarkedForReview ? 'Marked for Review' : 'Mark for Review'}
             </button>
           </div>
 
