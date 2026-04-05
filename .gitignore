@@ -6,6 +6,7 @@ Backend/node_modules/
 Frontend/dist/
 Frontend/build/
 Backend/dist/
+/.agents
 
 # Environment files
 .env
