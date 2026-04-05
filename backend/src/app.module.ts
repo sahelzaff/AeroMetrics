@@ -10,11 +10,14 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { BlueprintsModule } from './blueprints/blueprints.module';
 import { QuestionBankModule } from './question-bank/question-bank.module';
 import { HealthController } from './health.controller';
+import { ObservabilityModule } from './observability/observability.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
   controllers: [HealthController],
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ObservabilityModule,
     PrismaModule,
     AuthModule,
     ImportsModule,
@@ -24,6 +27,7 @@ import { HealthController } from './health.controller';
     AttemptsModule,
     AnalyticsModule,
     DashboardModule,
+    SearchModule,
   ],
 })
 export class AppModule {}

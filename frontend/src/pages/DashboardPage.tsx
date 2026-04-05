@@ -81,8 +81,8 @@ export function DashboardPage() {
         <div className="pointer-events-none absolute -bottom-24 left-12 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
 
         <div className="relative grid gap-6 lg:grid-cols-2 lg:items-end">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/80">Weekly Skill Lab</p>
+            <div>
+            {/* <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/80">Weekly Skill Lab</p> */}
             <h2 className="mt-2 text-3xl font-black tracking-tight md:text-4xl">Welcome back, {displayName}</h2>
             <p className="mt-2 max-w-xl text-sm text-white/85 md:text-base">
               You have {data.weakChapters.length} focus chapters this week. Keep your momentum and push your weighted score higher.

@@ -1,4 +1,4 @@
-﻿import {
+import {
   BadRequestException,
   Injectable,
   UnauthorizedException,
@@ -9,6 +9,7 @@ import { randomUUID } from 'crypto';
 import * as bcrypt from 'bcrypt';
 import { AuthProvider, type User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { ObservabilityService } from '../observability/observability.service';
 
 export const REFRESH_COOKIE_NAME = 'mcq_refresh_token';
 
@@ -23,6 +24,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly observabilityService: ObservabilityService,
   ) {}
 
   async register(email: string, password: string, name: string | undefined, sessionMeta: SessionMeta) {
@@ -47,19 +49,42 @@ export class AuthService {
       },
     });
 
+    void this.observabilityService.logEvent({
+      eventType: 'REGISTER_SUCCESS',
+      userId: user.id,
+      payload: { email: user.email, provider: 'LOCAL', ipAddress: sessionMeta.ipAddress },
+    });
+
     return this.issueTokenPair(user, undefined, sessionMeta);
   }
 
   async login(email: string, password: string, sessionMeta: SessionMeta) {
     const user = await this.prisma.user.findUnique({ where: { email: email.toLowerCase() } });
     if (!user?.passwordHash) {
+      void this.observabilityService.logEvent({
+        eventType: 'LOGIN_FAILED',
+        level: 'warn',
+        payload: { email: email.toLowerCase(), reason: 'user_not_found_or_no_password', ipAddress: sessionMeta.ipAddress },
+      });
       throw new UnauthorizedException('Invalid credentials');
     }
 
     const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) {
+      void this.observabilityService.logEvent({
+        eventType: 'LOGIN_FAILED',
+        level: 'warn',
+        userId: user.id,
+        payload: { email: user.email, reason: 'invalid_password', ipAddress: sessionMeta.ipAddress },
+      });
       throw new UnauthorizedException('Invalid credentials');
     }
+
+    void this.observabilityService.logEvent({
+      eventType: 'LOGIN_SUCCESS',
+      userId: user.id,
+      payload: { email: user.email, provider: 'LOCAL', ipAddress: sessionMeta.ipAddress },
+    });
 
     return this.issueTokenPair(user, undefined, sessionMeta);
   }
@@ -79,6 +104,12 @@ export class AuthService {
         },
       });
     }
+
+    void this.observabilityService.logEvent({
+      eventType: 'LOGIN_SUCCESS',
+      userId: user.id,
+      payload: { email: user.email, provider: 'GOOGLE', ipAddress: sessionMeta.ipAddress },
+    });
 
     await this.prisma.authAccount.upsert({
       where: {
@@ -115,21 +146,54 @@ export class AuthService {
 
       const session = await this.prisma.refreshSession.findUnique({ where: { id: decoded.sessionId } });
       if (!session || session.revokedAt || session.expiresAt < new Date() || session.userId !== decoded.sub) {
+        void this.observabilityService.logEvent({
+          eventType: 'TOKEN_REFRESH_FAILED',
+          level: 'warn',
+          userId: decoded.sub,
+          sessionId: decoded.sessionId,
+          payload: { reason: 'session_invalid_or_expired', ipAddress: sessionMeta.ipAddress },
+        });
         throw new UnauthorizedException('Session expired');
       }
 
       const tokenMatches = await bcrypt.compare(refreshToken, session.tokenHash);
       if (!tokenMatches) {
+        void this.observabilityService.logEvent({
+          eventType: 'TOKEN_REFRESH_FAILED',
+          level: 'warn',
+          userId: decoded.sub,
+          sessionId: decoded.sessionId,
+          payload: { reason: 'token_hash_mismatch', ipAddress: sessionMeta.ipAddress },
+        });
         throw new UnauthorizedException('Invalid refresh token');
       }
 
       const user = await this.prisma.user.findUnique({ where: { id: decoded.sub } });
       if (!user) {
+        void this.observabilityService.logEvent({
+          eventType: 'TOKEN_REFRESH_FAILED',
+          level: 'warn',
+          userId: decoded.sub,
+          sessionId: decoded.sessionId,
+          payload: { reason: 'user_not_found', ipAddress: sessionMeta.ipAddress },
+        });
         throw new UnauthorizedException('User not found');
       }
 
+      void this.observabilityService.logEvent({
+        eventType: 'TOKEN_REFRESH_SUCCESS',
+        userId: user.id,
+        sessionId: session.id,
+        payload: { email: user.email, ipAddress: sessionMeta.ipAddress },
+      });
+
       return this.issueTokenPair(user, session.id, sessionMeta);
     } catch {
+      void this.observabilityService.logEvent({
+        eventType: 'TOKEN_REFRESH_FAILED',
+        level: 'warn',
+        payload: { reason: 'invalid_refresh_token', ipAddress: sessionMeta.ipAddress },
+      });
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
@@ -142,6 +206,12 @@ export class AuthService {
     await this.prisma.refreshSession.updateMany({
       where: { id: sessionId, userId, revokedAt: null },
       data: { revokedAt: new Date() },
+    });
+
+    void this.observabilityService.logEvent({
+      eventType: 'LOGOUT_SUCCESS',
+      userId,
+      sessionId,
     });
 
     return { success: true };
@@ -221,3 +291,4 @@ export class AuthService {
     }
   }
 }
+

@@ -3,6 +3,7 @@ import { QuestionDifficulty } from '@prisma/client';
 import { createHash } from 'crypto';
 import { z } from 'zod';
 import { PrismaService } from '../prisma/prisma.service';
+import { ObservabilityService } from '../observability/observability.service';
 
 const questionSchema = z.object({
   question_text: z.string().min(5),
@@ -28,7 +29,10 @@ type ValidQuestion = z.infer<typeof questionSchema> & {
 
 @Injectable()
 export class ImportsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly observabilityService: ObservabilityService,
+  ) {}
 
   async dryRun(payload: unknown) {
     const { subject, chapter, validQuestions, invalidQuestions } = this.validateAndNormalize(payload);
@@ -79,7 +83,7 @@ export class ImportsService {
       }
     }
 
-    return {
+    const result = {
       subject,
       chapter,
       totalReceived: baseImportSchema.parse(payload).questions.length,
@@ -90,6 +94,18 @@ export class ImportsService {
       newQuestionsDetected: validQuestions.length - duplicates - updates,
       readyToImport: true,
     };
+
+    void this.observabilityService.logBusinessEvent('QUESTION_IMPORT_VALIDATED', {
+      subject,
+      chapter,
+      totalReceived: result.totalReceived,
+      validQuestions: result.validQuestions,
+      invalidCount: result.invalidQuestions.length,
+      duplicatesDetected: result.duplicatesDetected,
+      updatesDetected: result.updatesDetected,
+    });
+
+    return result;
   }
 
   async commit(payload: unknown) {
@@ -187,7 +203,7 @@ export class ImportsService {
       updatedCount += 1;
     }
 
-    return {
+    const result = {
       subject,
       chapter,
       totalReceived: baseImportSchema.parse(payload).questions.length,
@@ -198,6 +214,18 @@ export class ImportsService {
       importedCount: createdCount + updatedCount,
       failedCount: invalidQuestions.length,
     };
+
+    void this.observabilityService.logBusinessEvent('QUESTION_IMPORT_COMMITTED', {
+      subject,
+      chapter,
+      createdCount,
+      updatedCount,
+      duplicateCount,
+      invalidCount: invalidQuestions.length,
+      importedCount: result.importedCount,
+    });
+
+    return result;
   }
 
   private async createQuestionVersion(chapterId: string, question: ValidQuestion, version: number) {

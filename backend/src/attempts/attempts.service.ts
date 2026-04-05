@@ -1,10 +1,14 @@
-﻿import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { AttemptStatus, Trend } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { ObservabilityService } from '../observability/observability.service';
 
 @Injectable()
 export class AttemptsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly observabilityService: ObservabilityService,
+  ) {}
 
   async detail(userId: string, attemptId: string) {
     const attempt = await this.prisma.testAttempt.findFirst({
@@ -29,6 +33,12 @@ export class AttemptsService {
     if (!attempt) {
       throw new NotFoundException('Attempt not found');
     }
+
+    void this.observabilityService.logEvent({
+      eventType: 'TEST_REVIEW_VIEWED',
+      userId,
+      payload: { attemptId: attempt.id, status: attempt.status },
+    });
 
     return {
       attemptId: attempt.id,
@@ -63,13 +73,21 @@ export class AttemptsService {
       return attempt;
     }
 
-    return this.prisma.testAttempt.update({
+    const started = await this.prisma.testAttempt.update({
       where: { id: attemptId },
       data: {
         status: AttemptStatus.IN_PROGRESS,
         startedAt: new Date(),
       },
     });
+
+    void this.observabilityService.logEvent({
+      eventType: 'TEST_STARTED',
+      userId,
+      payload: { attemptId: started.id, blueprintId: started.blueprintId },
+    });
+
+    return started;
   }
 
   async answer(userId: string, attemptId: string, attemptQuestionId: string, selectedOptionId: string) {
@@ -189,6 +207,19 @@ export class AttemptsService {
       correct: Boolean(entry.answer?.isCorrect),
     })));
 
+    void this.observabilityService.logEvent({
+      eventType: 'TEST_SUBMITTED',
+      userId,
+      payload: {
+        attemptId: updated.id,
+        blueprintId: updated.blueprintId,
+        score: updated.score,
+        totalQuestions: updated.totalQuestions,
+        accuracy: Number(updated.accuracy.toFixed(2)),
+        timeSpentSeconds: updated.timeSpentSeconds,
+      },
+    });
+
     return {
       attemptId: updated.id,
       status: updated.status,
@@ -295,7 +326,7 @@ export class AttemptsService {
       }),
     ]);
 
-    return {
+    const result = {
       page: safePage,
       limit: safeLimit,
       total,
@@ -328,6 +359,14 @@ export class AttemptsService {
         };
       }),
     };
+
+    void this.observabilityService.logEvent({
+      eventType: 'TEST_HISTORY_VIEWED',
+      userId,
+      payload: { page: safePage, limit: safeLimit, returned: result.items.length },
+    });
+
+    return result;
   }
 
   private buildChapterStats(items: Array<{ chapterName: string; correct: boolean }>) {
@@ -439,4 +478,6 @@ export class AttemptsService {
     return Trend.STABLE;
   }
 }
+
+
 

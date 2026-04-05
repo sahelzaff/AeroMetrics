@@ -1,11 +1,15 @@
-﻿import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
+import { RequestLoggingInterceptor } from './common/interceptors/request-logging.interceptor';
+import { ObservabilityService } from './observability/observability.service';
+import { GlobalExceptionLoggingFilter } from './common/filters/global-exception-logging.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const observabilityService = app.get(ObservabilityService);
 
   app.enableCors({
     origin: process.env.FRONTEND_URL ?? 'http://localhost:5173',
@@ -20,6 +24,8 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+  app.useGlobalInterceptors(new RequestLoggingInterceptor(observabilityService));
+  app.useGlobalFilters(new GlobalExceptionLoggingFilter(observabilityService));
 
   const config = new DocumentBuilder()
     .setTitle('Weekly MCQ Test API')
