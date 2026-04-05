@@ -5,16 +5,20 @@ on:
     branches:
       - master
 
+defaults:
+  run:
+    shell: cmd
+
 jobs:
   deploy:
     runs-on: self-hosted
 
     steps:
       - name: Start Deployment
-        run: echo "🚀 Starting deployment at %DATE% %TIME%"
+        run: echo 🚀 Starting deployment
 
       - name: Deploy App
         run: powershell -ExecutionPolicy Bypass -File "C:\Users\RAKA\Documents\Work\deploy\AeroMetrics\deploy.ps1"
 
-      - name: End Deployment
-        run: echo "Deployment completed"
+      - name: Done
+        run: echo ✅ Deployment completed
