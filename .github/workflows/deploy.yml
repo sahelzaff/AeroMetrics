@@ -14,7 +14,7 @@ jobs:
         run: echo "🚀 Starting deployment at %DATE% %TIME%"
 
       - name: Deploy App
-        run: powershell ./deploy.ps1
+        run: powershell -ExecutionPolicy Bypass -File "C:\Users\RAKA\Documents\Work\deploy\AeroMetrics\deploy.ps1"
 
       - name: End Deployment
         run: echo "Deployment completed"
