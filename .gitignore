@@ -7,6 +7,7 @@ Frontend/dist/
 Frontend/build/
 Backend/dist/
 /.agents
+skills-lock.json
 
 # Environment files
 .env
@@ -15,6 +16,7 @@ Backend/.env
 
 # Logs
 *.log
+backend/logs/
 
 # OS files
 .DS_Store
