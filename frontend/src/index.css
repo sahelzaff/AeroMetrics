@@ -1,0 +1,95 @@
+﻿@import "tailwindcss";
+
+:root {
+  --surface: #f8f9fa;
+  --surface-low: #f3f4f5;
+  --surface-lowest: #ffffff;
+  --surface-high: #e7e8e9;
+  --surface-variant: #e1e3e4;
+  --on-surface: #191c1d;
+  --on-surface-variant: #424754;
+  --primary: #0058be;
+  --primary-container: #2170e4;
+  --secondary-container: #b6ccff;
+  --tertiary-fixed: #ffdcc6;
+  --tertiary: #924700;
+  --error: #ba1a1a;
+  --error-container: #ffdad6;
+  --outline-ghost: rgba(114, 119, 133, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at 10% -5%, rgba(33, 112, 228, 0.1), transparent 28%), var(--surface);
+  color: var(--on-surface);
+  font-family: Inter, "Segoe UI", sans-serif;
+}
+
+.ghost-separator {
+  border-color: var(--outline-ghost);
+}
+
+.surface-base {
+  background: var(--surface);
+}
+
+.surface-low {
+  background: var(--surface-low);
+}
+
+.surface-card {
+  background: var(--surface-lowest);
+}
+
+.soft-shadow {
+  box-shadow: 0 4px 20px rgba(25, 28, 29, 0.04), 0 2px 8px rgba(25, 28, 29, 0.02);
+}
+
+.frosted {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(24px);
+}
+
+.headline-tight {
+  letter-spacing: -0.02em;
+}
+
+.btn-primary {
+  @apply rounded-xl px-4 py-2 text-sm font-semibold text-white transition;
+  background-image: linear-gradient(135deg, var(--primary), var(--primary-container));
+}
+
+.btn-primary:hover {
+  filter: brightness(1.03);
+}
+
+.btn-primary:disabled {
+  @apply cursor-not-allowed opacity-50;
+}
+
+.btn-secondary {
+  @apply rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition;
+  border: 1px solid var(--outline-ghost);
+}
+
+.input {
+  @apply w-full rounded-xl bg-white px-3 py-2 text-sm outline-none transition;
+  border: 1px solid var(--outline-ghost);
+}
+
+.input:focus {
+  border-width: 1.5px;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(173, 198, 255, 0.4);
+}
+
+.card {
+  @apply rounded-2xl p-5;
+  background: var(--surface-lowest);
+  box-shadow: 0 4px 20px rgba(25, 28, 29, 0.04), 0 2px 8px rgba(25, 28, 29, 0.02);
+}

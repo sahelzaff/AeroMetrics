@@ -1,0 +1,354 @@
+{
+  "subject": "Aviation Meteorology",
+  "chapter": "Chapter 2 - Atmospheric Pressure",
+  "questions": [
+    {
+      "question_text": "Winds in a low pressure ________",
+      "options": ["Converge", "Diverge", "Go straight"],
+      "correct_option_index": 0,
+      "explanation": "Air converges towards low pressure.",
+      "difficulty": "EASY",
+      "tags": ["wind", "pressure"]
+    },
+    {
+      "question_text": "Low pressure is associated with ________",
+      "options": ["Good weather", "Bad weather", "None"],
+      "correct_option_index": 1,
+      "explanation": "Low pressure leads to rising air and clouds.",
+      "difficulty": "EASY",
+      "tags": ["weather"]
+    },
+    {
+      "question_text": "In a high pressure area winds are ________",
+      "options": ["Normal", "Strong", "Weak"],
+      "correct_option_index": 2,
+      "explanation": "Pressure gradient is weak → winds weak.",
+      "difficulty": "EASY",
+      "tags": ["wind"]
+    },
+    {
+      "question_text": "Flying from Low to High an altimeter would read ________",
+      "options": ["Over", "Under", "Constant"],
+      "correct_option_index": 1,
+      "explanation": "From low to high → altimeter underreads.",
+      "difficulty": "MEDIUM",
+      "tags": ["altimeter"]
+    },
+    {
+      "question_text": "Isallobars are lines of equal ________",
+      "options": ["Pressure", "Temperature Tendency", "Pressure Tendency"],
+      "correct_option_index": 2,
+      "explanation": "Isallobars show pressure change.",
+      "difficulty": "MEDIUM",
+      "tags": ["isobars"]
+    },
+    {
+      "question_text": "What kind of barometer is an altimeter?",
+      "options": ["Aneroid", "Mercury", "Alcohol"],
+      "correct_option_index": 0,
+      "explanation": "Altimeter is aneroid type.",
+      "difficulty": "EASY",
+      "tags": ["instrument"]
+    },
+    {
+      "question_text": "A region between two Lows and two Highs is ________",
+      "options": ["Depression", "Secondary Low", "Col"],
+      "correct_option_index": 2,
+      "explanation": "Col = saddle region.",
+      "difficulty": "MEDIUM",
+      "tags": ["pressure systems"]
+    },
+    {
+      "question_text": "Bad weather and better visibility is associated with ________",
+      "options": ["High", "Low", "Col"],
+      "correct_option_index": 1,
+      "explanation": "Low pressure → unstable air.",
+      "difficulty": "EASY",
+      "tags": ["weather"]
+    },
+    {
+      "question_text": "The relationship between height and pressure is used in ________",
+      "options": ["Altimeter", "ASI", "VSI"],
+      "correct_option_index": 0,
+      "explanation": "Altimeter works on pressure variation.",
+      "difficulty": "EASY",
+      "tags": ["instrument"]
+    },
+    {
+      "question_text": "Altimeter measures height above ________",
+      "options": ["MSL", "Datum of 1013.2 hPa", "Datum at which sub-scale is set"],
+      "correct_option_index": 2,
+      "explanation": "Depends on sub-scale setting.",
+      "difficulty": "MEDIUM",
+      "tags": ["altimeter"]
+    },
+
+    {
+      "question_text": "Two aircraft flying same indicated altitude: which has greater true altitude?",
+      "options": ["Warm air", "Cold air"],
+      "correct_option_index": 0,
+      "explanation": "Warm air expands → higher true altitude.",
+      "difficulty": "MEDIUM",
+      "tags": ["temperature", "altimetry"]
+    },
+    {
+      "question_text": "Rate of fall of pressure with height in warm air compared to cold air is ________",
+      "options": ["Same", "More", "Less"],
+      "correct_option_index": 2,
+      "explanation": "Pressure decreases slower in warm air.",
+      "difficulty": "MEDIUM",
+      "tags": ["pressure"]
+    },
+    {
+      "question_text": "Increase of 1000 ft corresponds to pressure decrease of ________",
+      "options": ["100 hPa", "1000 hPa", "3 hPa", "33 hPa"],
+      "correct_option_index": 2,
+      "explanation": "Approx 1 hPa ≈ 30 ft → ~3 hPa per 1000 ft.",
+      "difficulty": "EASY",
+      "tags": ["calculation"]
+    },
+
+    {
+      "question_text": "Lines of equal pressure are called ________",
+      "options": ["Isobars", "Isotherms", "Isogonal", "Isoclinic"],
+      "correct_option_index": 0,
+      "explanation": "Isobars connect equal pressure.",
+      "difficulty": "EASY",
+      "tags": ["charts"]
+    },
+    {
+      "question_text": "Which is true?",
+      "options": [
+        "Trough has frontal characteristics",
+        "At trough winds back in N hemisphere",
+        "At trough winds veer in N hemisphere"
+      ],
+      "correct_option_index": 1,
+      "explanation": "Wind backs in trough.",
+      "difficulty": "MEDIUM",
+      "tags": ["wind"]
+    },
+    {
+      "question_text": "Semi diurnal pressure changes are most pronounced in ________",
+      "options": ["Polar", "Middle latitudes", "Tropics"],
+      "correct_option_index": 2,
+      "explanation": "Strongest in tropics.",
+      "difficulty": "MEDIUM",
+      "tags": ["pressure"]
+    },
+    {
+      "question_text": "Flying Delhi to Kolkata drift starboard → actual altitude is ________",
+      "options": ["Lower", "Same", "Higher"],
+      "correct_option_index": 0,
+      "explanation": "Flying into lower pressure → true altitude lower.",
+      "difficulty": "HARD",
+      "tags": ["altimeter"]
+    },
+    {
+      "question_text": "Wind around low pressure in Southern Hemisphere ________",
+      "options": ["Clockwise", "Anticlockwise", "Across isobars"],
+      "correct_option_index": 0,
+      "explanation": "Coriolis reversed → clockwise.",
+      "difficulty": "MEDIUM",
+      "tags": ["wind"]
+    },
+    {
+      "question_text": "Altimeter on ground reads elevation when set to ________",
+      "options": ["QNH", "QNE", "QFF", "QFE"],
+      "correct_option_index": 0,
+      "explanation": "QNH gives elevation above MSL.",
+      "difficulty": "EASY",
+      "tags": ["altimeter"]
+    },
+    {
+      "question_text": "Instrument for recording pressure is ________",
+      "options": ["Anemograph", "Barometer", "Hygrograph"],
+      "correct_option_index": 1,
+      "explanation": "Barometer measures pressure.",
+      "difficulty": "EASY",
+      "tags": ["instrument"]
+    },
+
+    {
+      "question_text": "Poor visibility is associated with ________",
+      "options": ["High", "Low", "Trough"],
+      "correct_option_index": 0,
+      "explanation": "High pressure → stable → haze.",
+      "difficulty": "MEDIUM",
+      "tags": ["visibility"]
+    },
+    {
+      "question_text": "On either side perpendicular to ________ pressures rise",
+      "options": ["Trough", "Ridge", "Low"],
+      "correct_option_index": 0,
+      "explanation": "Pressure increases away from trough.",
+      "difficulty": "MEDIUM",
+      "tags": ["pressure"]
+    },
+    {
+      "question_text": "Fall of pressure with height is more rapid in ________",
+      "options": ["Cold areas", "Warm areas", "Humid areas"],
+      "correct_option_index": 0,
+      "explanation": "Cold air is dense → pressure falls faster.",
+      "difficulty": "MEDIUM",
+      "tags": ["pressure"]
+    },
+
+    {
+      "question_text": "300 hPa corresponds approximately to ________",
+      "options": ["20,000 ft", "30,000 ft", "35,000 ft"],
+      "correct_option_index": 1,
+      "explanation": "300 hPa ≈ FL300.",
+      "difficulty": "EASY",
+      "tags": ["ISA"]
+    },
+    {
+      "question_text": "18,000 ft corresponds to ________",
+      "options": ["700 hPa", "200 hPa", "500 hPa"],
+      "correct_option_index": 0,
+      "explanation": "FL180 ≈ 700 hPa.",
+      "difficulty": "EASY",
+      "tags": ["ISA"]
+    },
+    {
+      "question_text": "200 hPa corresponds to ________",
+      "options": ["20,000 ft", "30,000 ft", "40,000 ft"],
+      "correct_option_index": 2,
+      "explanation": "200 hPa ≈ FL400.",
+      "difficulty": "EASY",
+      "tags": ["ISA"]
+    },
+
+    {
+      "question_text": "24,000 ft corresponds to ________",
+      "options": ["400 hPa", "500 hPa", "300 hPa"],
+      "correct_option_index": 0,
+      "explanation": "Approx mapping.",
+      "difficulty": "MEDIUM",
+      "tags": ["ISA"]
+    },
+    {
+      "question_text": "700 hPa corresponds to ________",
+      "options": ["20,000 ft", "10,000 ft", "18,000 ft"],
+      "correct_option_index": 1,
+      "explanation": "700 hPa ≈ 10,000 ft.",
+      "difficulty": "EASY",
+      "tags": ["ISA"]
+    },
+    {
+      "question_text": "40,000 ft corresponds to ________",
+      "options": ["400 hPa", "500 hPa", "200 hPa"],
+      "correct_option_index": 2,
+      "explanation": "FL400 ≈ 200 hPa.",
+      "difficulty": "EASY",
+      "tags": ["ISA"]
+    },
+    {
+      "question_text": "850 hPa corresponds to ________",
+      "options": ["7000 ft", "5000 ft", "10,000 ft"],
+      "correct_option_index": 1,
+      "explanation": "850 hPa ≈ 5000 ft.",
+      "difficulty": "EASY",
+      "tags": ["ISA"]
+    },
+
+    {
+      "question_text": "Atmospheric pressure is due to ________",
+      "options": ["Wind", "Temperature", "Gravity", "Density"],
+      "correct_option_index": 2,
+      "explanation": "Weight of air due to gravity.",
+      "difficulty": "EASY",
+      "tags": ["basics"]
+    },
+    {
+      "question_text": "Aircraft gaining altitude with constant indication means ________",
+      "options": ["Pressure increased", "Flying towards high", "Flying towards low", "Temperature decreased"],
+      "correct_option_index": 2,
+      "explanation": "Low pressure → true altitude higher.",
+      "difficulty": "HARD",
+      "tags": ["altimeter"]
+    },
+    {
+      "question_text": "Contour 9160 m corresponds to ________",
+      "options": ["500 hPa", "400 hPa", "300 hPa", "200 hPa"],
+      "correct_option_index": 2,
+      "explanation": "≈ 300 hPa level.",
+      "difficulty": "MEDIUM",
+      "tags": ["charts"]
+    },
+    {
+      "question_text": "Contour interval at 300 hPa is ________",
+      "options": ["20 gpm", "40 gpm", "60 gpm", "80 gpm"],
+      "correct_option_index": 3,
+      "explanation": "Standard spacing.",
+      "difficulty": "MEDIUM",
+      "tags": ["charts"]
+    },
+    {
+      "question_text": "Contour interval at 500 hPa is ________",
+      "options": ["20 gpm", "40 gpm", "60 gpm", "80 gpm"],
+      "correct_option_index": 2,
+      "explanation": "500 hPa uses 60 gpm.",
+      "difficulty": "MEDIUM",
+      "tags": ["charts"]
+    },
+    {
+      "question_text": "QNH 1005 hPa at 160m elevation → QFE?",
+      "options": ["1010 hPa", "985 hPa", "1005 hPa", "990 hPa"],
+      "correct_option_index": 1,
+      "explanation": "160m ≈ 20 hPa drop → QFE ~985.",
+      "difficulty": "HARD",
+      "tags": ["altimeter", "calculation"]
+    },
+    {
+      "question_text": "Steep pressure gradient means ________",
+      "options": [
+        "Contours far apart, weak wind",
+        "Contours far apart, strong wind",
+        "Isobars far apart and low temp",
+        "Isobars close and strong wind"
+      ],
+      "correct_option_index": 3,
+      "explanation": "Closer isobars → strong winds.",
+      "difficulty": "EASY",
+      "tags": ["wind"]
+    },
+    {
+      "question_text": "Type of inversion in high pressure stable layer ________",
+      "options": ["Negative", "Radiation", "Subsidence", "Airmass"],
+      "correct_option_index": 2,
+      "explanation": "Subsidence inversion in high pressure.",
+      "difficulty": "MEDIUM",
+      "tags": ["inversion"]
+    },
+    {
+      "question_text": "True altitude increases when flying ________",
+      "options": ["Warm/Low", "Cold/Low", "Hot/High", "Cool/Low"],
+      "correct_option_index": 0,
+      "explanation": "Warm air → higher true altitude.",
+      "difficulty": "HARD",
+      "tags": ["altimeter"]
+    },
+    {
+      "question_text": "Wind in cyclone is ________",
+      "options": [
+        "Descending and subsiding",
+        "Ascending and converging",
+        "Descending and cooling",
+        "Ascending and diverging"
+      ],
+      "correct_option_index": 1,
+      "explanation": "Cyclone = rising + converging air.",
+      "difficulty": "EASY",
+      "tags": ["cyclone"]
+    },
+    {
+      "question_text": "Aerodrome at MSL, QNH 1014 → QFF is ________",
+      "options": ["1014", "1013.25", "Difficult", "More than QNH"],
+      "correct_option_index": 0,
+      "explanation": "At MSL QNH = QFF.",
+      "difficulty": "MEDIUM",
+      "tags": ["pressure"]
+    }
+  ]
+}

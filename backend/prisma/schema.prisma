@@ -1,0 +1,475 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// System roles for RBAC.
+enum Role {
+  ADMIN
+  USER
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+}
+
+/// Canonical question difficulty for test and analytics engines.
+enum QuestionDifficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+/// Attempt lifecycle status.
+enum AttemptStatus {
+  DRAFT
+  IN_PROGRESS
+  SUBMITTED
+  EXPIRED
+}
+
+/// Learner confidence captured per answer.
+enum ConfidenceLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+/// Trend direction used in chapter snapshots.
+enum Trend {
+  UP
+  DOWN
+  STABLE
+}
+
+/// Recommendation categories for adaptive coaching.
+enum RecommendationType {
+  REVISION
+  PRACTICE
+  SPEED_IMPROVEMENT
+}
+
+/// Revision queue source attribution.
+enum RevisionSource {
+  WRONG
+  WEAK_CHAPTER
+}
+
+/// Core account model for authentication and ownership.
+model User {
+  id                         String                      @id @default(uuid())
+  email                      String                      @unique
+  passwordHash               String?
+  name                       String?
+  role                       Role                        @default(USER)
+  createdAt                  DateTime                    @default(now())
+  updatedAt                  DateTime                    @updatedAt
+  authAccounts               AuthAccount[]
+  sessions                   Session[]
+  refreshSessions            RefreshSession[]
+  attempts                   TestAttempt[]
+  metrics                    ChapterMetricSnapshot[]
+  questionPerformanceMetrics QuestionPerformanceMetric[]
+  weakAreas                  WeakArea[]
+  recommendations            Recommendation[]
+  revisionQueue              RevisionQueue[]
+
+  @@index([role])
+}
+
+/// Linked social/local auth providers for a user.
+model AuthAccount {
+  id                String       @id @default(uuid())
+  userId            String
+  provider          AuthProvider
+  providerAccountId String
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+/// Canonical device/session tracking (production session model).
+model Session {
+  id               String    @id @default(uuid())
+  userId           String
+  refreshTokenHash String    @unique
+  deviceId         String?
+  userAgent        String?
+  ipAddress        String?
+  isRevoked        Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  expiresAt        DateTime
+  lastUsedAt       DateTime?
+  rotatedFromId    String?
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRevoked])
+  @@index([expiresAt])
+}
+
+/// Legacy refresh token session model kept for backward compatibility.
+model RefreshSession {
+  id          String    @id @default(uuid())
+  userId      String
+  tokenHash   String    @unique
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastUsedAt  DateTime?
+  rotatedFrom String?
+  ipAddress   String?
+  userAgent   String?
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt])
+  @@index([expiresAt])
+}
+
+/// Subject taxonomy root.
+model Subject {
+  id         String          @id @default(uuid())
+  name       String          @unique
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  chapters   Chapter[]
+  blueprints TestBlueprint[]
+  tests      Test[]
+}
+
+/// Chapter taxonomy under a subject.
+model Chapter {
+  id        String                  @id @default(uuid())
+  subjectId String
+  name      String
+  createdAt DateTime                @default(now())
+  updatedAt DateTime                @updatedAt
+  subject   Subject                 @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  questions Question[]
+  rules     BlueprintRule[]
+  snapshots ChapterMetricSnapshot[]
+  weakAreas WeakArea[]
+  sections  TestSection[]
+
+  @@unique([subjectId, name])
+  @@index([subjectId])
+}
+
+/// Production test entity (separate from blueprint template workflow).
+model Test {
+  id          String        @id @default(uuid())
+  subjectId   String
+  title       String
+  description String?
+  duration    Int
+  totalMarks  Int
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  subject     Subject       @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+  sections    TestSection[]
+  attempts    TestAttempt[]
+
+  @@index([subjectId])
+}
+
+/// Section inside a test; can be chapter-scoped.
+model TestSection {
+  id         String                @id @default(uuid())
+  testId     String
+  chapterId  String?
+  title      String
+  orderIndex Int
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
+  test       Test                  @relation(fields: [testId], references: [id], onDelete: Cascade)
+  chapter    Chapter?              @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+  questions  TestSectionQuestion[]
+
+  @@unique([testId, orderIndex])
+  @@index([testId])
+  @@index([chapterId])
+}
+
+/// Join model for normalized section-question assignment.
+model TestSectionQuestion {
+  id            String      @id @default(uuid())
+  testSectionId String
+  questionId    String
+  orderIndex    Int
+  marks         Int         @default(1)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  testSection   TestSection @relation(fields: [testSectionId], references: [id], onDelete: Cascade)
+  question      Question    @relation(fields: [questionId], references: [id], onDelete: Restrict)
+
+  @@unique([testSectionId, orderIndex])
+  @@unique([testSectionId, questionId])
+  @@index([testSectionId])
+  @@index([questionId])
+}
+
+/// Question bank entity (versioned, deduplicated by hash per chapter).
+model Question {
+  id                         String                      @id @default(uuid())
+  chapterId                  String
+  questionText               String
+  questionHash               String
+  version                    Int                         @default(1)
+  isLatest                   Boolean                     @default(true)
+  explanation                String?
+  difficulty                 QuestionDifficulty          @default(MEDIUM)
+  topic                      String?
+  sourceRef                  String?
+  tags                       String[]
+  createdAt                  DateTime                    @default(now())
+  updatedAt                  DateTime                    @updatedAt
+  chapter                    Chapter                     @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  options                    QuestionOption[]
+  attemptQs                  AttemptQuestion[]
+  sectionQuestions           TestSectionQuestion[]
+  questionPerformanceMetrics QuestionPerformanceMetric[]
+  revisionQueueItems         RevisionQueue[]
+
+  @@unique([chapterId, questionHash, version])
+  @@index([chapterId, questionHash, isLatest])
+  @@index([difficulty])
+}
+
+/// Options for a question (equivalent to requested Option model).
+model QuestionOption {
+  id         String          @id @default(uuid())
+  questionId String
+  text       String
+  sortOrder  Int
+  isCorrect  Boolean         @default(false)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  question   Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answers    AttemptAnswer[]
+
+  @@unique([questionId, sortOrder])
+  @@index([questionId])
+}
+
+/// Blueprint template for chapter-rule based generation.
+model TestBlueprint {
+  id               String          @id @default(uuid())
+  subjectId        String
+  name             String
+  totalQuestions   Int
+  timeLimitMinutes Int
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  subject          Subject         @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  rules            BlueprintRule[]
+  attempts         TestAttempt[]
+
+  @@index([subjectId])
+}
+
+/// Chapter/difficulty distribution rules per blueprint.
+model BlueprintRule {
+  id            String              @id @default(uuid())
+  blueprintId   String
+  chapterId     String
+  questionCount Int
+  difficulty    QuestionDifficulty?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  blueprint     TestBlueprint       @relation(fields: [blueprintId], references: [id], onDelete: Cascade)
+  chapter       Chapter             @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  @@index([blueprintId])
+  @@index([chapterId])
+  @@index([difficulty])
+}
+
+/// Attempt header with status, score and timing.
+model TestAttempt {
+  id                 String                 @id @default(uuid())
+  userId             String
+  blueprintId        String
+  testId             String?
+  status             AttemptStatus          @default(DRAFT)
+  score              Int                    @default(0)
+  accuracy           Float                  @default(0)
+  timeSpentSeconds   Int                    @default(0)
+  totalQuestions     Int
+  startedAt          DateTime?
+  submittedAt        DateTime?
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+  user               User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  blueprint          TestBlueprint          @relation(fields: [blueprintId], references: [id], onDelete: Restrict)
+  test               Test?                  @relation(fields: [testId], references: [id], onDelete: SetNull)
+  questions          AttemptQuestion[]
+  performanceMetrics TestPerformanceMetric?
+
+  @@index([userId])
+  @@index([blueprintId])
+  @@index([testId])
+  @@index([status])
+  @@index([submittedAt])
+}
+
+/// Snapshot of a question inside an attempt.
+model AttemptQuestion {
+  id         String         @id @default(uuid())
+  attemptId  String
+  questionId String
+  sequence   Int
+  orderIndex Int?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  attempt    TestAttempt    @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question   Question       @relation(fields: [questionId], references: [id], onDelete: Restrict)
+  answer     AttemptAnswer?
+
+  @@unique([attemptId, sequence])
+  @@unique([attemptId, questionId])
+  @@index([attemptId])
+  @@index([questionId])
+  @@index([orderIndex])
+}
+
+/// Answer event per attempt-question.
+model AttemptAnswer {
+  id                String          @id @default(uuid())
+  attemptQuestionId String          @unique
+  selectedOptionId  String
+  isCorrect         Boolean
+  timeSpentSeconds  Int             @default(0)
+  confidence        ConfidenceLevel @default(MEDIUM)
+  answeredAt        DateTime        @default(now())
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  attemptQuestion   AttemptQuestion @relation(fields: [attemptQuestionId], references: [id], onDelete: Cascade)
+  selectedOption    QuestionOption  @relation(fields: [selectedOptionId], references: [id], onDelete: Restrict)
+
+  @@index([selectedOptionId])
+  @@index([isCorrect])
+  @@index([confidence])
+}
+
+/// Chapter-level precomputed analytics snapshot for dashboard speed.
+model ChapterMetricSnapshot {
+  id             String   @id @default(uuid())
+  userId         String
+  chapterId      String
+  attemptsCount  Int      @default(0)
+  totalAttempts  Int      @default(0)
+  totalCorrect   Int      @default(0)
+  totalQuestions Int      @default(0)
+  accuracy       Float    @default(0)
+  averageScore   Float    @default(0)
+  masteryScore   Float    @default(0)
+  trend          Trend    @default(STABLE)
+  priorityScore  Float    @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chapter        Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, chapterId])
+  @@index([userId])
+  @@index([chapterId])
+  @@index([trend])
+}
+
+/// Per-attempt advanced KPI metrics for ranking and quality scoring.
+model TestPerformanceMetric {
+  id            String      @id @default(uuid())
+  attemptId     String      @unique
+  speed         Float       @default(0) // Questions per minute
+  accuracy      Float       @default(0)
+  weightedScore Float       @default(0)
+  qualityScore  Float       @default(0)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  attempt       TestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  @@index([attemptId])
+  @@index([qualityScore])
+}
+
+/// Per-user per-question rolling performance aggregate.
+model QuestionPerformanceMetric {
+  id              String    @id @default(uuid())
+  userId          String
+  questionId      String
+  timesSeen       Int       @default(0)
+  timesCorrect    Int       @default(0)
+  timesWrong      Int       @default(0)
+  avgTimeSpent    Float     @default(0)
+  lastAttemptedAt DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question        Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questionId])
+  @@index([userId])
+  @@index([questionId])
+  @@index([lastAttemptedAt])
+}
+
+/// Computed weak chapter ranking for targeted remediation.
+model WeakArea {
+  id            String   @id @default(uuid())
+  userId        String
+  chapterId     String
+  weaknessScore Float
+  lastUpdated   DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chapter       Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, chapterId])
+  @@index([userId, weaknessScore])
+  @@index([chapterId])
+}
+
+/// Recommendation feed generated by the intelligence engine.
+model Recommendation {
+  id          String             @id @default(uuid())
+  userId      String
+  type        RecommendationType
+  message     String
+  priority    Int                @default(1)
+  isCompleted Boolean            @default(false)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([isCompleted, priority])
+}
+
+/// Scheduled revision queue for spaced practice and weak-area reinforcement.
+model RevisionQueue {
+  id          String         @id @default(uuid())
+  userId      String
+  questionId  String
+  source      RevisionSource
+  priority    Int            @default(1)
+  scheduledAt DateTime
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question    Question       @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([userId, scheduledAt])
+  @@index([questionId])
+  @@index([source, priority])
+}
